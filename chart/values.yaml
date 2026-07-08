@@ -1,0 +1,95 @@
+nameOverride: ""
+fullnameOverride: ""
+
+replicaCount: 1
+
+## Container image (Nexus dev registry)
+image:
+  repository: 10.244.20.62:8081/local-docker-repository/hdc-nexus-mcp-server
+  tag: latest
+  pullPolicy: Always
+
+## Kubernetes Service
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+## Container resources
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "500m"
+    memory: "256Mi"
+
+## Nexus credentials — from AWS Secrets Manager via ExternalSecret
+## Secret: argomanagement/dev/nexus-helm  keys: username / password
+nexus:
+  ## Nexus base URL (set via extraEnv.NEXUS_HOST — overridable per environment)
+  host: "registry-nexus.orbis.dedalus.com"
+  externalSecret:
+    enabled: true
+    refreshInterval: 1h
+    secretStore:
+      name: aws-secrets-manager
+      kind: ClusterSecretStore
+    remoteKey: "argomanagement/dev/nexus-helm"
+    remoteProperties:
+      user: "username"
+      password: "password"
+
+## Liveness / readiness probes
+probes:
+  liveness:
+    path: /health
+    initialDelaySeconds: 10
+    periodSeconds: 30
+    failureThreshold: 3
+  readiness:
+    path: /health
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 3
+
+## imagePullSecret — synced from AWS SM via ExternalSecret
+imagePullSecret:
+  enabled: true
+  secretStore:
+    name: aws-secrets-manager
+    kind: ClusterSecretStore
+  remoteKey: "nexus/dev/docker-credentials"
+
+tolerations: []
+additionalLabels: {}
+deploymentAnnotations: {}
+extraEnv:
+  NEXUS_HOST: "registry-nexus.orbis.dedalus.com"
+
+## Pod annotations for mcp-registry auto-discovery
+podAnnotations:
+  mcp.io/endpoint: "http://nexus-mcp-server-hdc-nexus-mcp-server.mcp-servers.svc.cluster.local:80/mcp"
+  mcp.io/description: "Read-only Nexus Repository Manager MCP server - search Docker images and artifacts"
+  mcp.io/tags: "nexus,docker,artifacts,repository,search,read-only"
+  mcp.io/capabilities: "tools"
+  mcp.io/transport: "streamable-http"
+  mcp.io/scopes: "mcp:nexus:read"
+
+## HTTPRoute for NGINX Gateway Fabric
+httpRoute:
+  enabled: true
+  hostname: mcp-gitops.eks.internal
+  pathPrefix: /mcp-servers/nexus
+  gateway:
+    name: nginx
+    namespace: nginx-gateway
+
+## Kong Ingress — enable to protect /mcp with key-auth
+kongIngress:
+  enabled: false
+  pathPrefix: /mcp-servers/nexus
+  plugins: "mcp-key-auth,mcp-rate-limit"
+  proxyServiceName: kong-proxy
+  proxyServiceNamespace: api-gateway
+  proxyServicePort: 80

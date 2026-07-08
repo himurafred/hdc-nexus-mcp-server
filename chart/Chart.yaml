@@ -1,0 +1,16 @@
+apiVersion: v2
+name: hdc-nexus-mcp-server
+description: Helm chart for the Nexus MCP Server — read-only Nexus Repository Manager search via FastAPI + FastMCP
+type: application
+version: 0.1.0
+appVersion: latest
+
+keywords:
+  - mcp
+  - nexus
+  - repository
+  - docker
+  - artifacts
+
+sources:
+  - https://github.com/himurafred/hdc-nexus-mcp-server

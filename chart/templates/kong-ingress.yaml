@@ -1,0 +1,35 @@
+{{- if .Values.kongIngress.enabled }}
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongIngress
+metadata:
+  name: {{ include "hdc-nexus-mcp-server.fullname" . }}-strip-path
+  namespace: {{ .Values.kongIngress.proxyServiceNamespace }}
+  labels:
+    {{- include "hdc-nexus-mcp-server.labels" . | nindent 4 }}
+upstream:
+  strip_path: true
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "hdc-nexus-mcp-server.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "hdc-nexus-mcp-server.labels" . | nindent 4 }}
+  annotations:
+    konghq.com/plugins: {{ .Values.kongIngress.plugins | quote }}
+    konghq.com/strip-path: "true"
+    kubernetes.io/ingress.class: kong
+spec:
+  rules:
+    - http:
+        paths:
+          - path: {{ .Values.kongIngress.pathPrefix }}/mcp
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "hdc-nexus-mcp-server.fullname" . }}
+                port:
+                  number: {{ .Values.service.port }}
+{{- end }}
