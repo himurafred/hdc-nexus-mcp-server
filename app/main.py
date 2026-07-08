@@ -82,15 +82,33 @@ from app.mcp_server import mcp, _request_info
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI):
-    logger.info("nexus-mcp-server starting up")
-    yield
+    async with mcp.session_manager.run():
+        yield
     logger.info("nexus-mcp-server shutting down — closing HTTP clients")
     await nexus_client.close_all()
 
 
-app = FastAPI(title="nexus-mcp-server", lifespan=_lifespan)
+app = FastAPI(
+    title="nexus-mcp-server",
+    redirect_slashes=False,
+    lifespan=_lifespan,
+)
 
-FastAPIInstrumentor.instrument_app(app)
+
+def _server_request_hook(span, scope):
+    """Rename OTel spans for MCP endpoints to include method + path."""
+    if span and span.is_recording():
+        path = scope.get("path", "")
+        method = scope.get("method", "")
+        if path and method and path != "/health":
+            span.update_name(f"{method} {path}")
+
+
+FastAPIInstrumentor.instrument_app(
+    app,
+    excluded_urls="/health",
+    server_request_hook=_server_request_hook,
+)
 
 
 # ── Audit middleware — capture client IP + Kong consumer ─────────────────────
@@ -117,6 +135,6 @@ async def health():
     return JSONResponse({"status": "ok", "service": "nexus-mcp-server"})
 
 
-# ── Mount MCP at /mcp ─────────────────────────────────────────────────────────
+# ── Mount MCP at root so FastMCP's internal /mcp route is exposed at /mcp ────
 
-app.mount("/mcp", mcp.streamable_http_app())
+app.mount("/", mcp.streamable_http_app())
