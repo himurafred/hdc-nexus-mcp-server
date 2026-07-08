@@ -16,6 +16,8 @@ logger = logging.getLogger(__name__)
 _USER = os.environ.get("NEXUS_USER", "")
 _PASSWORD = os.environ.get("NEXUS_PASSWORD", "")
 DEFAULT_HOST = os.environ.get("NEXUS_HOST", "registry-nexus.orbis.dedalus.com")
+# Context path prefix — Nexus is sometimes deployed under /nexus (default) or /
+_BASE_PATH = os.environ.get("NEXUS_BASE_PATH", "/nexus").rstrip("/")
 
 # Per-host HTTP client cache (host supplied at call-time)
 _clients: dict[str, httpx.AsyncClient] = {}
@@ -52,7 +54,7 @@ def _raise_for_status(resp: httpx.Response) -> None:
 
 async def list_repositories(host: str) -> list[dict[str, Any]]:
     """Return all repositories visible to the configured user."""
-    resp = await _client(host).get("/service/rest/v1/repositories")
+    resp = await _client(host).get(f"{_BASE_PATH}/service/rest/v1/repositories")
     _raise_for_status(resp)
     repos = resp.json()
     logger.info("list_repositories host=%s count=%d", host, len(repos))
@@ -93,7 +95,7 @@ async def search_components(
         if continuation_token:
             params["continuationToken"] = continuation_token
 
-        resp = await _client(host).get("/service/rest/v1/search", params=params)
+        resp = await _client(host).get(f"{_BASE_PATH}/service/rest/v1/search", params=params)
         _raise_for_status(resp)
         data = resp.json()
 
