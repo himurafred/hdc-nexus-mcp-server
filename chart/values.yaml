@@ -64,8 +64,7 @@ imagePullSecret:
 tolerations: []
 additionalLabels: {}
 deploymentAnnotations: {}
-extraEnv:
-  NEXUS_HOST: "registry-nexus.orbis.dedalus.com"
+extraEnv: {}
 
 ## Pod annotations for mcp-registry auto-discovery
 podAnnotations:
