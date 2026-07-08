@@ -151,9 +151,9 @@ async def search_components(
     )
 )
 async def search_docker_tags(
+    image_name: str,
     host: str = DEFAULT_HOST,
     repository: str = "docker-hosted",
-    image_name: str,
     max_results: int = Field(default=20, ge=1, le=100),
 ) -> list[dict]:
     _t0 = _time.monotonic()
@@ -191,9 +191,9 @@ async def search_docker_tags(
     )
 )
 async def get_latest_version(
+    name: str,
     host: str = DEFAULT_HOST,
     repository: str = "",
-    name: str,
     group: str | None = None,
     format: str | None = None,
 ) -> dict | None:
