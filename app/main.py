@@ -124,6 +124,7 @@ async def _audit_middleware(request: Request, call_next):
         "client_ip": ip,
         "consumer": request.headers.get("X-Consumer-Username", "")
                     or request.headers.get("X-Consumer-Id", ""),
+        "authenticated_user": request.headers.get("X-Authenticated-User", ""),
     })
     return await call_next(request)
 

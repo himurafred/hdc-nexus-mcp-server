@@ -39,10 +39,16 @@ def _audit(tool: str, status: str, duration_ms: int, **kv) -> None:
         caller += f" trace_id={trace_id}"
     if req.get("client_ip"):
         caller += f" client_ip={req['client_ip']}"
-    if req.get("consumer"):
+    if req.get("authenticated_user"):
+        caller += f" user={req['authenticated_user']}"
+        if span.is_recording():
+            span.set_attribute("mcp.user", req["authenticated_user"])
+    elif req.get("consumer"):
         caller += f" consumer={req['consumer']}"
+        if span.is_recording():
+            span.set_attribute("mcp.user", req["consumer"])
 
-    extra = "".join(f" {k}={v}" for k, v in kv.items() if v is not None)
+    extra = "" .join(f" {k}={v}" for k, v in kv.items() if v is not None)
     logger.info("AUDIT tool=%s status=%s duration_ms=%d%s%s", tool, status, duration_ms, caller, extra)
 
 
