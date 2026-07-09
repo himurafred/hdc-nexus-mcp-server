@@ -68,7 +68,7 @@ extraEnv: {}
 
 ## Pod annotations for mcp-registry auto-discovery
 podAnnotations:
-  mcp.io/endpoint: "http://nexus-mcp-server-hdc-nexus-mcp-server.mcp-servers.svc.cluster.local:80/mcp"
+  mcp.io/endpoint: "https://mcp-gitops.eks.internal/mcp-servers/nexus/mcp"
   mcp.io/description: "Read-only Nexus Repository Manager MCP server - search Docker images and artifacts"
   mcp.io/tags: "nexus,docker,artifacts,repository,search,read-only"
   mcp.io/capabilities: "tools"
