@@ -138,4 +138,23 @@ async def health():
 
 # ── Mount MCP at root so FastMCP's internal /mcp route is exposed at /mcp ────
 
-app.mount("/", mcp.streamable_http_app())
+
+class _TrustProxyHost:
+    """ASGI middleware: rewrite Host header to 'localhost:8000' so FastMCP's
+    DNS-rebinding protection (added in mcp>=1.28) accepts reverse-proxied
+    requests.  Auth is already enforced upstream by Kong."""
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope.get("type") in ("http", "websocket"):
+            scope = dict(scope)
+            scope["headers"] = [
+                (b"host", b"localhost:8000") if k == b"host" else (k, v)
+                for k, v in scope["headers"]
+            ]
+        await self.app(scope, receive, send)
+
+
+app.mount("/", _TrustProxyHost(mcp.streamable_http_app()))
