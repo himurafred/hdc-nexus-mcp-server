@@ -1,0 +1,54 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: hdc-nexus-mcp-server
+  title: HDC Nexus MCP Server
+  description: >
+    Read-only MCP server for searching Nexus Repository Manager 3.
+    Exposes tools to list repositories, search components (Docker, Maven, npm,
+    PyPI), list Docker image tags, and get the latest version of any artifact.
+  annotations:
+    github.com/project-slug: himurafred/hdc-nexus-mcp-server
+    backstage.io/kubernetes-id: nexus-mcp-server-hdc-nexus-mcp-server
+    backstage.io/kubernetes-namespace: mcp-servers
+  tags:
+    - mcp
+    - nexus
+    - artifacts
+    - python
+    - fastapi
+  links:
+    - url: https://mcp-gitops.eks.internal/mcp-servers/nexus/mcp
+      title: MCP Endpoint
+      icon: web
+spec:
+  type: service
+  lifecycle: production
+  owner: group:default/platform-team
+  system: mcp-platform
+  providesApis:
+    - nexus-mcp-api
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: nexus-mcp-api
+  title: Nexus MCP API
+  description: MCP protocol endpoint for Nexus Repository Manager queries.
+  tags:
+    - mcp
+spec:
+  type: openapi
+  lifecycle: production
+  owner: group:default/platform-team
+  system: mcp-platform
+  definition: |
+    openapi: 3.0.0
+    info:
+      title: Nexus MCP Server
+      version: 1.0.0
+    paths:
+      /mcp:
+        post:
+          summary: MCP JSON-RPC endpoint
