@@ -84,11 +84,11 @@ httpRoute:
     name: nginx
     namespace: nginx-gateway
 
-## Kong Ingress — enable to protect /mcp with key-auth
+## Kong Ingress — enable to protect /mcp with Bearer token auth
 kongIngress:
   enabled: false
   pathPrefix: /mcp-servers/nexus
-  plugins: "mcp-key-auth,mcp-rate-limit"
+  plugins: "mcp-extract-user,mcp-rate-limit"
   proxyServiceName: kong-proxy
   proxyServiceNamespace: api-gateway
   proxyServicePort: 80
