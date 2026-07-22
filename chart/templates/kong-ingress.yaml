@@ -1,7 +1,7 @@
 {{- if .Values.kongIngress.enabled }}
 ---
-# Kong Ingress — reçoit les requêtes /mcp depuis nginx Rule 1
-# strip-path: true + pathPrefix → backend reçoit /mcp
+# Kong Ingress — receives /mcp requests from nginx Rule 1
+# strip-path: true + pathPrefix → backend receives /mcp
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
