@@ -9,6 +9,7 @@ Tools:
   - list_repositories   : list all visible repositories
   - search_components   : generic component search (Maven, npm, PyPI, raw…)
   - search_docker_tags  : list Docker image tags sorted newest first
+  - find_docker_image   : auto-discover image across common namespaces
   - get_latest_version  : return the single latest version of a component
 """
 
@@ -182,6 +183,66 @@ async def search_docker_tags(
         _audit("search_docker_tags", "error", int((_time.monotonic() - _t0) * 1000),
                host=host, error=str(exc)[:120])
         raise
+
+
+# ── Tool: find_docker_image ────────────────────────────────────────────────────
+
+# Known namespace prefixes used in this Nexus instance, tried in order.
+# Empty string "" means no prefix (image stored at root level).
+_DOCKER_NAMESPACES = ["", "oas/", "orbis-u/", "hdc/", "local/"]
+
+
+@mcp.tool(
+    description=(
+        _HOST_DOC + "\n\n"
+        "Find a Docker image by base name, automatically trying all known namespace "
+        "prefixes (`oas/`, `orbis-u/`, `hdc/`, `local/`, and no prefix).\n\n"
+        "Use this tool when you only know the short image name (e.g. `orbis-events-4u`, "
+        "`kafka-backup`) without knowing the exact namespace. The tool probes each prefix "
+        "and returns the tags from the first match.\n\n"
+        "**image_base_name**: short image name WITHOUT any namespace prefix "
+        "(e.g. `orbis-events-4u`, `kafka-backup`).\n\n"
+        "**repository**: Docker repository to search. Use `docker-all` to cover all "
+        "Docker repositories (proxy + hosted + group). Default: `docker-all`.\n\n"
+        "**max_results**: max tags to return (1–100, default 10)."
+    )
+)
+async def find_docker_image(
+    image_base_name: str,
+    host: str = DEFAULT_HOST,
+    repository: str = "docker-all",
+    max_results: int = Field(default=10, ge=1, le=100),
+) -> dict:
+    _t0 = _time.monotonic()
+    for ns in _DOCKER_NAMESPACES:
+        full_name = f"{ns}{image_base_name}"
+        try:
+            tags = await nexus.search_docker_tags(
+                host=host,
+                repository=repository,
+                image_name=full_name,
+                max_results=max_results,
+            )
+            if tags:
+                _audit(
+                    "find_docker_image", "success",
+                    int((_time.monotonic() - _t0) * 1000),
+                    host=host, repository=repository,
+                    image=full_name, count=len(tags),
+                )
+                return {"image": full_name, "repository": repository, "tags": tags}
+        except PermissionError as exc:
+            _audit("find_docker_image", "permission_error",
+                   int((_time.monotonic() - _t0) * 1000), host=host, error=str(exc)[:120])
+            raise ValueError(str(exc)) from exc
+        except Exception:
+            continue  # namespace not found — try next
+
+    _audit("find_docker_image", "not_found",
+           int((_time.monotonic() - _t0) * 1000),
+           host=host, repository=repository, image=image_base_name)
+    return {"image": None, "repository": repository, "tags": [],
+            "message": f"No Docker image matching '{image_base_name}' found in any known namespace."}
 
 
 # ── Tool: get_latest_version ───────────────────────────────────────────────────
