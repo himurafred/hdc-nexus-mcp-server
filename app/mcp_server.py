@@ -53,9 +53,9 @@ def _audit(tool: str, status: str, duration_ms: int, **kv) -> None:
 
 
 _HOST_DOC = (
-    "**host**: Nexus Repository Manager hostname or IP "
-    "(e.g. `nexus.example.com` or `10.244.20.62:8081`). "
-    f"Defaults to `{DEFAULT_HOST}` — only override if targeting a different Nexus instance."
+    "**host**: Nexus Repository Manager hostname — a DNS name or IP, never a repository name. "
+    f"Defaults to `{DEFAULT_HOST}` — do NOT change unless targeting a completely different Nexus instance. "
+    "Do NOT set host to `docker-all`, `docker-hosted` or any repository name; those go in **repository**."
 )
 
 mcp = FastMCP(
