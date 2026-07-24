@@ -149,10 +149,11 @@ async def search_components(
     description=(
         _HOST_DOC + "\n\n"
         "List Docker image tags for a given image, sorted newest first.\n\n"
-        "**repository**: Docker repository name in Nexus (e.g. `docker-hosted`, "
-        "`local-docker-repository`).\n\n"
-        "**image_name**: image name to search (e.g. `hdc-oracle-mcp-server`). "
-        "Wildcards `*` supported.\n\n"
+        "**repository**: Docker repository name in Nexus. Use `docker-all` to search "
+        "across all Docker repositories (proxy + hosted + group). Use `docker-hosted` "
+        "for internally built images only. For production images, prefer `docker-all`.\n\n"
+        "**image_name**: image name to search — may include a namespace prefix "
+        "(e.g. `orbis-u/kafka-backup`, `hdc-oracle-mcp-server`). Wildcards `*` supported.\n\n"
         "**max_results**: max tags to return (1–100, default 20)."
     )
 )
