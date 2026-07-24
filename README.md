@@ -9,9 +9,10 @@ Read-only MCP server for searching Nexus Repository Manager 3.
 | `list_repositories` | List all visible repositories |
 | `search_components` | Search components (Docker, Maven, npm, PyPI…) by name/group/version/format |
 | `search_docker_tags` | List Docker image tags for a given image, newest first |
+| `find_docker_image` | Auto-discover a Docker image by base name, probing known namespace prefixes (`oas/`, `orbis-u/`, `hdc/`, `local/`, none) |
 | `get_latest_version` | Get the single latest version of a component |
 
-Every tool takes **`host`** as first parameter (the Nexus hostname, e.g. `10.244.20.62:8081`).
+Every tool takes **`host`** as first parameter (Nexus hostname, defaults to `registry-nexus.orbis.dedalus.com`). Only override if targeting a different Nexus instance — do not set it to a repository name.
 Credentials (`NEXUS_USER` / `NEXUS_PASSWORD`) are injected via ExternalSecret from AWS Secrets Manager (`nexus/dev/credentials`).
 
 ## Build & push
