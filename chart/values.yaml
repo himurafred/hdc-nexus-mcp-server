@@ -69,8 +69,8 @@ extraEnv: {}
 ## Pod annotations for mcp-registry auto-discovery
 podAnnotations:
   mcp.io/endpoint: "https://mcp-gitops.eks.internal/mcp-servers/nexus/mcp"
-  mcp.io/description: "Read-only Nexus Repository Manager MCP server - search Docker images and artifacts"
-  mcp.io/tags: "nexus,docker,artifacts,repository,search,read-only"
+  mcp.io/description: "Nexus artifact registry: list Docker images, browse Maven/npm packages, inspect artifact versions and metadata."
+  mcp.io/tags: "nexus,docker,artifacts,packages,docker-images,docker-registry,artifact-management"
   mcp.io/capabilities: "artifacts,packages,docker,registry"
   mcp.io/transport: "streamable-http"
   mcp.io/scopes: "mcp:nexus:read"
