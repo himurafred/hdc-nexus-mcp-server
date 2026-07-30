@@ -77,7 +77,7 @@ mcp = FastMCP(
 @mcp.tool(
     description=(
         _HOST_DOC + "\n\n"
-        "List all repositories visible to the configured user.\n[tags: nexus,repository,list,repos]"
+        "List all repositories visible to the configured user.\n[tags: nexus,repository]"
     )
 )
 async def list_repositories(host: str = DEFAULT_HOST) -> list[dict]:
@@ -108,7 +108,7 @@ async def list_repositories(host: str = DEFAULT_HOST) -> list[dict]:
         "**group**: group/namespace filter, e.g. Maven groupId (optional).\n\n"
         "**version**: exact version filter (optional).\n\n"
         "**format**: `docker`, `maven2`, `npm`, `pypi`, `raw`… (optional).\n\n"
-        "**max_results**: max items to return (1–100, default 25).\n[tags: nexus,artifact,docker,search,component,image,list,maven,npm]"
+        "**max_results**: max items to return (1–100, default 25).\n[tags: nexus,artifact,docker,component,image,maven,npm]"
     )
 )
 async def search_components(
@@ -155,7 +155,7 @@ async def search_components(
         "for internally built images only. For production images, prefer `docker-all`.\n\n"
         "**image_name**: image name to search — may include a namespace prefix "
         "(e.g. `orbis-u/kafka-backup`, `hdc-oracle-mcp-server`). Wildcards `*` supported.\n\n"
-        "**max_results**: max tags to return (1–100, default 20).\n[tags: nexus,docker,tag,image,search,list]"
+        "**max_results**: max tags to return (1–100, default 20).\n[tags: nexus,docker,tag,image]"
     )
 )
 async def search_docker_tags(
@@ -204,7 +204,7 @@ _DOCKER_NAMESPACES = ["", "oas/", "orbis-u/", "hdc/", "local/"]
         "(e.g. `orbis-events-4u`, `kafka-backup`).\n\n"
         "**repository**: Docker repository to search. Use `docker-all` to cover all "
         "Docker repositories (proxy + hosted + group). Default: `docker-all`.\n\n"
-        "**max_results**: max tags to return (1–100, default 10).\n[tags: nexus,docker,image,find,search]"
+        "**max_results**: max tags to return (1–100, default 10).\n[tags: nexus,docker,image,find]"
     )
 )
 async def find_docker_image(
