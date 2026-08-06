@@ -68,7 +68,7 @@ extraEnv: {}
 
 ## Pod annotations for mcp-registry auto-discovery
 podAnnotations:
-  mcp.io/endpoint: "https://mcp-gitops.eks.internal/mcp-servers/nexus/mcp"
+  mcp.io/endpoint: "https://mcp.kafka.985420682567.pbu.internal/mcp-servers/nexus/mcp"
   mcp.io/description: "Nexus Repository Manager: Docker images, Maven/npm packages, artifact versions and metadata. Use for any artifact, image, package, snapshot, release or component version lookup."
   mcp.io/tags: "nexus,docker,artifacts,packages,docker-images,docker-registry,artifact-management,maven,npm,snapshot,release,component,image-tag"
   mcp.io/capabilities: "artifacts,packages,docker,registry,maven,npm"
@@ -78,7 +78,7 @@ podAnnotations:
 ## HTTPRoute for NGINX Gateway Fabric
 httpRoute:
   enabled: true
-  hostname: mcp-gitops.eks.internal
+  hostname: mcp.kafka.985420682567.pbu.internal
   pathPrefix: /mcp-servers/nexus
   gateway:
     name: nginx

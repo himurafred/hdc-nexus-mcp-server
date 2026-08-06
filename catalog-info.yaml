@@ -19,7 +19,7 @@ metadata:
     - python
     - fastapi
   links:
-    - url: https://mcp-gitops.eks.internal/mcp-servers/nexus/mcp
+    - url: https://mcp.kafka.985420682567.pbu.internal/mcp-servers/nexus/mcp
       title: MCP Endpoint
       icon: web
 spec:
