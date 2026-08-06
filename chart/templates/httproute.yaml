@@ -20,6 +20,9 @@ spec:
       sectionName: https
   hostnames:
     - {{ .Values.httpRoute.hostname | quote }}
+    {{- range .Values.httpRoute.additionalHostnames }}
+    - {{ . | quote }}
+    {{- end }}
   rules:
     {{- if .Values.kongIngress.enabled }}
     # Route /mcp → Kong proxy (key-auth)
